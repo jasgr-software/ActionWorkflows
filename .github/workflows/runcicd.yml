@@ -74,7 +74,7 @@ jobs:
         if: ${{ inputs.upload-artifact }}
         uses: actions/upload-artifact@v3.0.0
         with:
-          name: ${{env.repo-name}}
+          name: ${{inputs.repo-name}}
           path: snapshot         
           
       - name: NuGet Package
