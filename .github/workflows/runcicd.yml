@@ -28,7 +28,16 @@ on:
       publish-nuget:
         description: Do you want to publish nuget?
         type: boolean
-        default: false      
+        default: false
+    secrets:
+      NUGET_SOURCE:
+        required: true
+      NUGET_NAME:
+        required: true
+      NUGET_USER:
+        required: true
+      NUGET_TOKEN:
+        required: true
     
 jobs:
   build:
@@ -46,7 +55,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1           
       
       - name: Add nuget source
-        run: dotnet nuget add source ${{ secrets.JASGR_NUGET }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.PACKAGE_TOKEN }} --store-password-in-clear-text
+        run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
       
       - name: Restore Nuget packages
         run: dotnet restore
@@ -74,4 +83,4 @@ jobs:
         
       - name: NuGet Push
         if: ${{ inputs.publish-nuget }}
-        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.PACKAGE_TOKEN}} --source  ${{ secrets.JASGR_NUGET }} --skip-duplicate
+        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate
