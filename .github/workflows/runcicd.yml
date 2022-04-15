@@ -32,12 +32,14 @@ on:
     
 jobs:
   build:
+    name: Run Pipeline
+    
     runs-on: ${{ inputs.runs-on }
+    
     env:
       csproj: ${{inputs.repo-name}}.csproj
     
     steps:      
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - name: setup-msbuild
