@@ -21,15 +21,14 @@ on:
         description: Do you want to upload artifacts?
         type: boolean
         default: false
-      publish-nuget:
-        description: Do you want to publish nuget?
-        type: boolean
-        default: false
       publish-configuration:
         description: Configuration to publish
         type: string
         default: Release
-
+      publish-nuget:
+        description: Do you want to publish nuget?
+        type: boolean
+        default: false      
     
 jobs:
   build:
