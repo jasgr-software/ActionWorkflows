@@ -3,9 +3,6 @@ name: Run CI/CD
 on:
   workflow_call:  
     inputs:
-      branch-name:
-        required: true
-        type: string
       repo-name:
         required: true
         type: string
@@ -28,6 +25,10 @@ on:
         description: Configuration to publish
         type: string
         default: Release
+      publish-nuget:
+        description: Do you want to upload to NuGet?
+        type: boolean
+        default: false
     secrets:
       NUGET_SOURCE:
         required: true
@@ -77,9 +78,9 @@ jobs:
           path: snapshot         
           
       - name: NuGet Package
-        if: ${{ inputs.branch-name }} == 'main'
+        if: ${{ inputs.publish-nuget }}
         run: dotnet pack --configuration ${{ inputs.publish-configuration }}
         
       - name: NuGet Push
-        if: ${{ inputs.branch-name }} == 'main'
+        if: ${{ inputs.publish-nuget }}
         run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate
