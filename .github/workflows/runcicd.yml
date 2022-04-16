@@ -67,7 +67,7 @@ jobs:
     
     env:
       csproj: ${{inputs.repo-name}}.csproj
-      image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.repo-name}}:${{inputs.app-version}}-${{inputs.docker-tag}
+      image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.repo-name}}:${{inputs.app-version}}-${{inputs.docker-tag}}
     
     steps:      
       - uses: actions/checkout@v3
