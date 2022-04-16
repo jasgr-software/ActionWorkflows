@@ -29,15 +29,35 @@ on:
         description: Do you want to upload to NuGet?
         type: boolean
         default: false
+      push-docker:
+        description: Do you want to push docker contaoiner?
+        type: boolean
+        default: false
+      docker-registry:    
+        description: The docker registry you want to use
+        type: string
+        default: ghcr.io
+      docker-user:
+        description: The docker user
+        type: string
+      docker-tag:
+        description: The docker tag
+        type: string
+        default: SNAPSHOT
     secrets:
       NUGET_SOURCE:
-        required: true
+        required: false
       NUGET_NAME:
-        required: true
+        required: false
       NUGET_USER:
-        required: true
+        required: false
       NUGET_TOKEN:
-        required: true
+        required: false
+      DOCKER_LOGIN:
+        required: false
+      DOCKER_PAT:
+        required: false
+      
     
 jobs:
   build:
@@ -47,6 +67,7 @@ jobs:
     
     env:
       csproj: ${{inputs.repo-name}}.csproj
+      image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.repo-name}}:${{inputs.app-version}}-${{inputs.docker-tag}
     
     steps:      
       - uses: actions/checkout@v3
@@ -84,3 +105,20 @@ jobs:
       - name: NuGet Push
         if: ${{ inputs.publish-nuget }}
         run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate
+        
+      - name: Login to GitHub Container Registry
+        if: ${{ inputs.push-docker }}
+        uses: docker/login-action@v1
+        with:
+          registry: ${{inputs.docker-registry}}
+          username: ${{inputs.docker-user}}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build the hello-world Docker image
+        if: ${{ inputs.push-docker }}
+        run: |
+          docker build . --tag ${{env.image-name}}
+          docker run ${{env.image-name}}
+          docker push ${{env.image-name}}
+
+
