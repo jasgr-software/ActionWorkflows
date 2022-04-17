@@ -117,7 +117,7 @@ jobs:
       - name: Build Docker Image
         if: ${{ inputs.push-docker }}
         run: |
-          docker build . --tag ${{inputs.app-version}}-${{inputs.docker-tag}}
+          docker build -f Dockerfile .. --tag event-service-api:${{inputs.app-version}}-${{inputs.docker-tag}}
           docker run ${{env.image-name}}
           docker push ${{env.image-name}}
 
