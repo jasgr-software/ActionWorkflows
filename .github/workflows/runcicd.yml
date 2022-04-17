@@ -30,7 +30,7 @@ on:
         type: boolean
         default: false
       push-docker:
-        description: Do you want to push docker contaoiner?
+        description: Do you want to push docker container?
         type: boolean
         default: false
       docker-registry:    
