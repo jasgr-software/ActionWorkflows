@@ -1,0 +1,83 @@
+name: Run CI/CD NuGet
+
+on:
+  workflow_call:  
+    inputs:
+      repo-name:
+        required: true
+        type: string
+      app-version:
+        required: true
+        type: string
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: windows-latest
+      run-tests:
+        description: Do you want to Run tests?
+        type: boolean
+        default: false
+      upload-artifact:
+        description: Do you want to upload artifacts?
+        type: boolean
+        default: false
+      publish-configuration:
+        description: Configuration to publish
+        type: string
+        default: Release
+    secrets:
+      NUGET_SOURCE:
+        required: false
+      NUGET_NAME:
+        required: false
+      NUGET_USER:
+        required: false
+      NUGET_TOKEN:
+        required: false
+      
+    
+jobs:
+  build:
+    name: Run CI/CD NuGet
+    
+    runs-on: ${{ inputs.runs-on }}
+    
+    env:
+      csproj: ${{inputs.repo-name}}.csproj            
+    
+    steps:      
+      - uses: actions/checkout@v3
+
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.1           
+      
+      - name: Add NuGet source
+        run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
+      
+      - name: Restore NuGet packages
+        run: dotnet restore
+        
+      - name: Build Project
+        run: msbuild ${{env.csproj}}
+        
+      - name: Run Tests
+        if: ${{ inputs.test }}
+        run: dotnet test ${{env.csproj}} --no-build --verbosity normal
+
+      - name: dotnet publish 
+        run: dotnet publish ${{env.csproj}} -c ${{ inputs.publish-configuration }} -o snapshot
+        
+      - name: Upload a Build Artifact
+        if: ${{ inputs.upload-artifact }}
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: ${{inputs.repo-name}}
+          path: snapshot         
+          
+      - name: NuGet Package
+        run: dotnet pack --configuration ${{ inputs.publish-configuration }}
+        
+      - name: NuGet Push
+        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate        
+          
+
