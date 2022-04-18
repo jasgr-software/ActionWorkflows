@@ -1,0 +1,63 @@
+name: Run CI/CD
+
+on:
+  workflow_call:  
+    inputs:
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: windows-latest
+      docker-registry:    
+        description: The docker registry you want to use
+        type: string
+        default: ghcr.io
+      docker-user:
+        description: The docker user
+        type: string
+      docker-tag:
+        description: The docker tag
+        type: string
+        default: SNAPSHOT
+    secrets:
+      DOCKER_LOGIN:
+        required: false
+      DOCKER_PAT:
+        required: false
+      
+    
+jobs:
+  build:
+    name: Run Pipeline
+    
+    runs-on: ${{ inputs.runs-on }}
+    
+    env:
+      csproj: ${{inputs.repo-name}}.csproj     
+      image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.docker-tag}}
+    
+    steps:      
+      - uses: actions/checkout@v3
+
+      #- name: setup-msbuild
+      #  uses: microsoft/setup-msbuild@v1.1           
+      
+      - name: Login to GitHub Container Registry
+        if: ${{ inputs.push-docker }}
+        uses: docker/login-action@v1
+        with:
+          registry: ${{inputs.docker-registry}}
+          username: ${{inputs.docker-user}}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build Docker Image
+        run: docker build -f Dockerfile .. --tag ${{env.image-name}}
+          
+      - name: Run Docker Image
+        run: docker run ${{env.image-name}}
+         
+      - name: Push Docker Image
+        run: docker push ${{env.image-name}}
+          
+          
+
+
