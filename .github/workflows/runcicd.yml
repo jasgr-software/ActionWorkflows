@@ -66,8 +66,7 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     
     env:
-      csproj: ${{inputs.repo-name}}.csproj
-      image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.repo-name}}:${{inputs.app-version}}-${{inputs.docker-tag}}
+      csproj: ${{inputs.repo-name}}.csproj      
     
     steps:      
       - uses: actions/checkout@v3
@@ -117,8 +116,10 @@ jobs:
       - name: Build Docker Image
         if: ${{ inputs.push-docker }}
         run: |
-          docker build -f Dockerfile .. --tag event-service-api:${{inputs.app-version}}-${{inputs.docker-tag}}
+          docker build . --tag ${{image-name}}
           docker run ${{env.image-name}}
           docker push ${{env.image-name}}
+        env:
+          image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.docker-tag}}
 
 
