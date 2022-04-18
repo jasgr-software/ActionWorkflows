@@ -115,10 +115,9 @@ jobs:
 
       - name: Build Docker Image
         if: ${{ inputs.push-docker }}
-        run: |
-          docker build . --tag ${{env.image-name}}
-          docker run ${{env.image-name}}
-          docker push ${{env.image-name}}
+        run: docker build . --tag ${{env.image-name}}
+          #docker run ${{env.image-name}}
+          #docker push ${{env.image-name}}
         env:
           image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.docker-tag}}
           
