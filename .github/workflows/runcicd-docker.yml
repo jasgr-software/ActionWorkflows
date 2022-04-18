@@ -47,10 +47,7 @@ jobs:
           password: ${{ secrets.DOCKER_PAT }}
 
       - name: Build Docker Image
-        run: docker build -f Dockerfile .. --tag ${{env.image-name}}
-          
-      - name: Run Docker Image
-        run: docker run ${{env.image-name}}
+        run: docker build -f Dockerfile .. --tag ${{env.image-name}}          
          
       - name: Push Docker Image
         run: docker push ${{env.image-name}}
