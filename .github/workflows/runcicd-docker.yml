@@ -19,8 +19,6 @@ on:
         type: string
         default: SNAPSHOT
     secrets:
-      DOCKER_LOGIN:
-        required: false
       DOCKER_PAT:
         required: false
       
