@@ -67,6 +67,7 @@ jobs:
     
     env:
       csproj: ${{inputs.repo-name}}.csproj      
+      image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.docker-tag}}
     
     steps:      
       - uses: actions/checkout@v3
@@ -119,7 +120,6 @@ jobs:
           docker build . --tag ${{image-name}}
           docker run ${{env.image-name}}
           docker push ${{env.image-name}}
-        env:
-          image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.docker-tag}}
+          
 
 
