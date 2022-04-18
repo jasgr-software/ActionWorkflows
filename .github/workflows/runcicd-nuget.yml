@@ -78,6 +78,6 @@ jobs:
         run: dotnet pack --configuration ${{ inputs.publish-configuration }}
         
       - name: NuGet Push
-        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate        
+        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }}
           
 
