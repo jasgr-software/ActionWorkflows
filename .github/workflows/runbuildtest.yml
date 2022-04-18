@@ -1,12 +1,9 @@
-name: Run CI/CD
+name: Run Build /Test
 
 on:
   workflow_call:  
     inputs:
       repo-name:
-        required: true
-        type: string
-      app-version:
         required: true
         type: string
       runs-on:
@@ -15,18 +12,6 @@ on:
         default: windows-latest
       run-tests:
         description: Do you want to Run tests?
-        type: boolean
-        default: false
-      upload-artifact:
-        description: Do you want to upload artifacts?
-        type: boolean
-        default: false
-      publish-configuration:
-        description: Configuration to publish
-        type: string
-        default: Release
-      publish-nuget:
-        description: Do you want to upload to NuGet?
         type: boolean
         default: false
     secrets:
@@ -67,24 +52,5 @@ jobs:
       - name: Run Tests
         if: ${{ inputs.test }}
         run: dotnet test ${{env.csproj}} --no-build --verbosity normal
-
-      - name: dotnet publish 
-        run: dotnet publish ${{env.csproj}} -c ${{ inputs.publish-configuration }} -o snapshot
-        
-      - name: Upload a Build Artifact
-        if: ${{ inputs.upload-artifact }}
-        uses: actions/upload-artifact@v3.0.0
-        with:
-          name: ${{inputs.repo-name}}
-          path: snapshot         
           
-      - name: NuGet Package
-        if: ${{ inputs.publish-nuget }}
-        run: dotnet pack --configuration ${{ inputs.publish-configuration }}
-        
-      - name: NuGet Push
-        if: ${{ inputs.publish-nuget }}
-        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }}
-          
-
 

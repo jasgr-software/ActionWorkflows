@@ -1,4 +1,4 @@
-name: Run CI/CD
+name: Run CI/CD NuGet
 
 on:
   workflow_call:  
@@ -25,10 +25,6 @@ on:
         description: Configuration to publish
         type: string
         default: Release
-      publish-nuget:
-        description: Do you want to upload to NuGet?
-        type: boolean
-        default: false
     secrets:
       NUGET_SOURCE:
         required: false
@@ -42,7 +38,7 @@ on:
     
 jobs:
   build:
-    name: Run Pipeline
+    name: Run CI/CD NuGet
     
     runs-on: ${{ inputs.runs-on }}
     
@@ -79,12 +75,9 @@ jobs:
           path: snapshot         
           
       - name: NuGet Package
-        if: ${{ inputs.publish-nuget }}
         run: dotnet pack --configuration ${{ inputs.publish-configuration }}
         
       - name: NuGet Push
-        if: ${{ inputs.publish-nuget }}
         run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }}
           
-
 
