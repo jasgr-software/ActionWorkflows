@@ -39,7 +39,6 @@ jobs:
       #  uses: microsoft/setup-msbuild@v1.1           
       
       - name: Login to GitHub Container Registry
-        if: ${{ inputs.push-docker }}
         uses: docker/login-action@v1
         with:
           registry: ${{inputs.docker-registry}}
