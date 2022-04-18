@@ -1,4 +1,4 @@
-name: Run CI/CD
+name: Run Docker Build/Publish
 
 on:
   workflow_call:  
@@ -27,7 +27,7 @@ on:
     
 jobs:
   build:
-    name: Run Pipeline
+    name: Docker Build/Publish
     
     runs-on: ${{ inputs.runs-on }}
     
