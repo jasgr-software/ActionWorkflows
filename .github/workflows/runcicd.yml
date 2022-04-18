@@ -74,36 +74,36 @@ jobs:
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.1           
       
-      - name: Add NuGet source
-        run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
+      #- name: Add NuGet source
+      #  run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
       
-      - name: Restore NuGet packages
-        run: dotnet restore
+      #- name: Restore NuGet packages
+      #  run: dotnet restore
         
-      - name: Build Project
-        run: msbuild ${{env.csproj}}
+      #- name: Build Project
+      #  run: msbuild ${{env.csproj}}
         
-      - name: Run Tests
-        if: ${{ inputs.test }}
-        run: dotnet test ${{env.csproj}} --no-build --verbosity normal
+      #- name: Run Tests
+      #  if: ${{ inputs.test }}
+      #  run: dotnet test ${{env.csproj}} --no-build --verbosity normal
 
-      - name: dotnet publish 
-        run: dotnet publish ${{env.csproj}} -c ${{ inputs.publish-configuration }} -o snapshot
+      #- name: dotnet publish 
+      #  run: dotnet publish ${{env.csproj}} -c ${{ inputs.publish-configuration }} -o snapshot
         
-      - name: Upload a Build Artifact
-        if: ${{ inputs.upload-artifact }}
-        uses: actions/upload-artifact@v3.0.0
-        with:
-          name: ${{inputs.repo-name}}
-          path: snapshot         
+      #- name: Upload a Build Artifact
+      #  if: ${{ inputs.upload-artifact }}
+      #  uses: actions/upload-artifact@v3.0.0
+      #  with:
+      #    name: ${{inputs.repo-name}}
+      #    path: snapshot         
           
-      - name: NuGet Package
-        if: ${{ inputs.publish-nuget }}
-        run: dotnet pack --configuration ${{ inputs.publish-configuration }}
+      #- name: NuGet Package
+      #  if: ${{ inputs.publish-nuget }}
+      #  run: dotnet pack --configuration ${{ inputs.publish-configuration }}
         
-      - name: NuGet Push
-        if: ${{ inputs.publish-nuget }}
-        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate
+      #- name: NuGet Push
+      #  if: ${{ inputs.publish-nuget }}
+      #  run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate
         
       - name: Login to GitHub Container Registry
         if: ${{ inputs.push-docker }}
