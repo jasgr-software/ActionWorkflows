@@ -1,0 +1,57 @@
+name: Run Build /Test
+
+on:
+  workflow_call:  
+    inputs:
+      repo-name:
+        required: true
+        type: string
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: windows-latest
+      run-tests:
+        description: Do you want to Run tests?
+        type: boolean
+        default: false
+      upload-artifact:
+    secrets:
+      NUGET_SOURCE:
+        required: false
+      NUGET_NAME:
+        required: false
+      NUGET_USER:
+        required: false
+      NUGET_TOKEN:
+        required: false
+      
+    
+jobs:
+  build:
+    name: Run Pipeline
+    
+    runs-on: ${{ inputs.runs-on }}
+    
+    env:
+      csproj: ${{inputs.repo-name}}.csproj            
+    
+    steps:      
+      - uses: actions/checkout@v3
+
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.1           
+      
+      - name: Add NuGet source
+        run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
+      
+      - name: Restore NuGet packages
+        run: dotnet restore
+        
+      - name: Build Project
+        run: msbuild ${{env.csproj}}
+        
+      - name: Run Tests
+        if: ${{ inputs.test }}
+        run: dotnet test ${{env.csproj}} --no-build --verbosity normal
+          
+
