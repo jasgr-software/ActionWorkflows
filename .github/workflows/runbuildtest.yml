@@ -14,7 +14,6 @@ on:
         description: Do you want to Run tests?
         type: boolean
         default: false
-      upload-artifact:
     secrets:
       NUGET_SOURCE:
         required: false
