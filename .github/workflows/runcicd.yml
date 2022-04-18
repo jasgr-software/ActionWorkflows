@@ -29,21 +29,6 @@ on:
         description: Do you want to upload to NuGet?
         type: boolean
         default: false
-      push-docker:
-        description: Do you want to push docker container?
-        type: boolean
-        default: false
-      docker-registry:    
-        description: The docker registry you want to use
-        type: string
-        default: ghcr.io
-      docker-user:
-        description: The docker user
-        type: string
-      docker-tag:
-        description: The docker tag
-        type: string
-        default: SNAPSHOT
     secrets:
       NUGET_SOURCE:
         required: false
@@ -52,10 +37,6 @@ on:
       NUGET_USER:
         required: false
       NUGET_TOKEN:
-        required: false
-      DOCKER_LOGIN:
-        required: false
-      DOCKER_PAT:
         required: false
       
     
@@ -74,53 +55,36 @@ jobs:
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.1           
       
-      #- name: Add NuGet source
-      #  run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
+      - name: Add NuGet source
+        run: dotnet nuget add source ${{ secrets.NUGET_SOURCE }} -n ${{ secrets.NUGET_NAME }} -u ${{ secrets.NUGET_USER }} -p ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text
       
-      #- name: Restore NuGet packages
-      #  run: dotnet restore
+      - name: Restore NuGet packages
+        run: dotnet restore
         
-      #- name: Build Project
-      #  run: msbuild ${{env.csproj}}
+      - name: Build Project
+        run: msbuild ${{env.csproj}}
         
-      #- name: Run Tests
-      #  if: ${{ inputs.test }}
-      #  run: dotnet test ${{env.csproj}} --no-build --verbosity normal
+      - name: Run Tests
+        if: ${{ inputs.test }}
+        run: dotnet test ${{env.csproj}} --no-build --verbosity normal
 
-      #- name: dotnet publish 
-      #  run: dotnet publish ${{env.csproj}} -c ${{ inputs.publish-configuration }} -o snapshot
+      - name: dotnet publish 
+        run: dotnet publish ${{env.csproj}} -c ${{ inputs.publish-configuration }} -o snapshot
         
-      #- name: Upload a Build Artifact
-      #  if: ${{ inputs.upload-artifact }}
-      #  uses: actions/upload-artifact@v3.0.0
-      #  with:
-      #    name: ${{inputs.repo-name}}
-      #    path: snapshot         
-          
-      #- name: NuGet Package
-      #  if: ${{ inputs.publish-nuget }}
-      #  run: dotnet pack --configuration ${{ inputs.publish-configuration }}
-        
-      #- name: NuGet Push
-      #  if: ${{ inputs.publish-nuget }}
-      #  run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate
-        
-      - name: Login to GitHub Container Registry
-        if: ${{ inputs.push-docker }}
-        uses: docker/login-action@v1
+      - name: Upload a Build Artifact
+        if: ${{ inputs.upload-artifact }}
+        uses: actions/upload-artifact@v3.0.0
         with:
-          registry: ${{inputs.docker-registry}}
-          username: ${{inputs.docker-user}}
-          password: ${{ secrets.DOCKER_PAT }}
-
-      - name: Build Docker Image
-        if: ${{ inputs.push-docker }}
-        run: docker build -f Dockerfile .. --tag ${{env.image-name}}
-        #run: docker build . --tag ${{env.image-name}}
-          #docker run ${{env.image-name}}
-          #docker push ${{env.image-name}}
-        env:
-          image-name: ${{inputs.docker-registry}}/${{inputs.docker-user}}/${{inputs.docker-tag}}
+          name: ${{inputs.repo-name}}
+          path: snapshot         
+          
+      - name: NuGet Package
+        if: ${{ inputs.publish-nuget }}
+        run: dotnet pack --configuration ${{ inputs.publish-configuration }}
+        
+      - name: NuGet Push
+        if: ${{ inputs.publish-nuget }}
+        run: dotnet nuget push "bin/Release/${{inputs.repo-name}}.${{inputs.app-version}}.nupkg"  --api-key ${{secrets.NUGET_TOKEN}} --source  ${{ secrets.NUGET_SOURCE }} --skip-duplicate        
           
 
 
